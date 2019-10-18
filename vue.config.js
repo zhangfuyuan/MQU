@@ -19,19 +19,20 @@ module.exports = {
       }
     }
   },
-	devServer: {
-		port: '8126',
-		host: '192.168.1.83',
-		open: true,
-		proxy: {
-			'/api': {
-				target: 'http://119.23.61.139/prm-web/a',
-				ws: true,
-				changeOrigin: true,
-				pathRewrite:{
-					'^/api': ''
-				}
-			}
-		}
-	}
+  devServer: {
+    port: '8126',
+    host: '192.168.1.83',
+    open: true,
+    proxy: {
+      '/api': {
+        //target: 'http://119.23.61.139/prm-web',
+        target: 'http://192.168.1.28:8081/commServer',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite:{
+          '^/api': ''
+        }
+      }
+    }
+  }
 };

@@ -35,6 +35,8 @@ module.exports = {
 		undoSend: '取消发送',
 		undoSendTips: '取消发送后内容无法保留',
 		returnHome: '返回首页',
+		waitAMoment: '再等片刻',
+		failedToSend: '网络异常 , 发送失败',
 	},
 	quickUpload: {
 		title: '快传',

@@ -35,6 +35,8 @@ module.exports = {
 		undoSend: 'Undo send',
 		undoSendTips: 'Content cannot be retained after unsending',
 		returnHome: 'Return home',
+		waitAMoment: 'Wait a moment',
+		failedToSend: 'Network exception, failed to send',
 	},
 	quickUpload: {
 		title: 'Quick upload',
