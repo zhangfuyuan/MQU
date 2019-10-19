@@ -26,7 +26,7 @@ export default {
         (new window.WebUploader.Uploader()).md5File(file).then((val) => {
           window.console.log(`${file.name} md5：${val}`);
 
-          file.md5 = val;
+          file.extraMd5 = val;
           return deferred.resolve();
         });
 

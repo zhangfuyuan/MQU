@@ -24,12 +24,14 @@ const service = axios.create({
   // 但是一般公司都不会每次都设置代理，而是使用固定的开发模式，例如直接做一个跨域的设置，一劳永逸
   // 这里设置该属性还需要api开发者支持，设置后台的php程序里的header
   withCredentials: true,
-  // 请求头，因为我们要使用formdata形式，所以设置如下
-  // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-  // 如果采用json传递给后台数据，格式如下（默认）
-  'Content-Type': 'application/json; charset=UTF-8',
-  // 如果上传图片、视频等多媒体文件给后台数据，格式如下
-  // 'Content-Type': 'multipart/form-data',
+  headers: {
+    // 请求头，因为我们要使用formdata形式，所以设置如下
+    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    // 如果采用json传递给后台数据，格式如下（默认）
+    // 'Content-Type': 'application/json;charset=UTF-8',
+    // 如果上传图片、视频等多媒体文件给后台数据，格式如下
+    // 'Content-Type': 'multipart/form-data',
+  }
 });
 
 // request拦截器
@@ -37,8 +39,8 @@ service.interceptors.request.use(
   config => {
     let data = config.data;
     
-    if (data.contentType === 'formdata') {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+    if (data.contentType === 'json') {
+      config.headers['Content-Type'] = 'application/json;charset=UTF-8';
     } else if (data.contentType === 'multipart') {
       config.headers['Content-Type'] = 'multipart/form-data';
     }

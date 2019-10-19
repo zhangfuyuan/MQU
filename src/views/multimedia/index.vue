@@ -150,12 +150,12 @@
           <!-- 右下角操作 -->
           <div class="action">
             <!-- 取消读取 -->
-            <template v-if="isReading">
+            <!-- <template v-if="isReading">
               <span class="action-cancel" @click="cancelReading">{{$t('common.cancel')}}</span>
-            </template>
+            </template> -->
             
             <!-- 删除内容 -->
-            <template v-else>
+            <template v-if="!isReading">
               <span class="action-remove" @click="removeMedia">{{$t('common.remove')}}</span>
             </template>
           </div>
@@ -215,6 +215,7 @@
           class="mqu-field mqu-field-fill"
           v-model="tempTextEditData.content"
           type="textarea"
+          :maxlength="curMediaList[curMediaIndex].type==='run' ? 80 : 240"
           :placeholder="$t('multimedia.clickInput')"
           :style="{ 
             color: tempTextEditData.content ? convertRGBA(tempTextEditData.color, curMediaList[curMediaIndex].type==='run'&&tempTextEditData.content ? tempTextEditData.opacity : '1') : '#333333',
@@ -340,7 +341,7 @@
       :close-on-click-overlay="false"
     >
       <!-- 上传完成 -->
-      <template v-if="submittedNum===curMediaList.length && submitProgress===100">
+      <template v-if="submittedNum===curMediaList.length && submitProgress===100 && !stopUpload">
         <div class="end">
           <div class="end-img">
             <img src="../../assets/img/icon.png" alt="icon" width="100%" height="100%" />
@@ -459,6 +460,7 @@ export default {
       oHeight: parseInt(document.documentElement.clientHeight||document.body.clientHeight), // 初始化时页面高度
       uploader: null, // WebUploader 实例对象（动态）
       serverTaskId: '', // 后台任务ID
+      stopUpload: false, // 是否暂停上传
     }
   },
 
@@ -558,6 +560,7 @@ export default {
       this.submittedNum = 0;
       this.wuDestroy();
       this.serverTaskId = '';
+      this.stopUpload = false;
     },
     
     // 添加 “图片/视频”
@@ -961,20 +964,28 @@ export default {
         return false;
       }
       
+      const _teid = this.$route.query.teid;
+      window.console.log(`终端ID：${_teid}`);
+      
+      if (!_teid) {
+        Toast(this.$t('multimedia.failedToSend'));
+        this.resetUpload();
+        return false;
+      }
+      
       this.showUploadingPopup = true;
-      window.console.log(this.$route.query);
       
       // 创建任务
       createTask({
         name: '多媒体任务',
         type: '1',
-        teid: this.$route.query.teid,
+        teid: _teid,
       }).then(res => {
         window.console.log(res);
         
         if (!this.showUploadingPopup) return false;
         
-        if (res.errcode === 0) {
+        if (res.errcode == 0) {
           let _taskId = res.data.id;
           
           this.serverTaskId = _taskId;
@@ -985,29 +996,29 @@ export default {
               kind: '3',
               taskId: _taskId,
               content: JSON.stringify({
-                "index": _runIndex,
+                "index": _runIndex + 1,
                 "kind": "3",
-                "transparency": parseInt(this.curMediaList[_runIndex].data.opacity),
+                "transparency": parseInt(this.curMediaList[_runIndex].data.opacity*100),
                 "color": this.curMediaList[_runIndex].data.color,
                 "bold": this.curMediaList[_runIndex].data.weight==='normal' ? "0" : "1",
                 "shadow": this.curMediaList[_runIndex].data.shadow==='0 0 0' ? "0" : "1",
                 "text": this.curMediaList[_runIndex].data.content,
               }),
-              index: _runIndex,
+              index: _runIndex + 1,
             }) : Promise.resolve();
             // 有文本信息则上传文本信息；没文本信息，马上返回一个resolved状态的 Promise 对象
             const p2 = _txtIndex>-1 ? this.uploadRunOrTxt({
               kind: '4',
               taskId: _taskId,
               content: JSON.stringify({
-                "index": _txtIndex,
+                "index": _txtIndex + 1,
                 "kind": "4",
                 "color": this.curMediaList[_txtIndex].data.color,
                 "bold": this.curMediaList[_txtIndex].data.weight==='normal' ? "0" : "1",
                 "shadow": this.curMediaList[_txtIndex].data.shadow==='0 0 0' ? "0" : "1",
                 "text": this.curMediaList[_txtIndex].data.content,
               }),
-              index: _txtIndex,
+              index: _txtIndex +1 ,
             }) : Promise.resolve();
             
             Promise.all([p1, p2]).then(() => {
@@ -1049,14 +1060,14 @@ export default {
     
     // 取消发送
     undoSend() {
+      this.stopUpload = true;
+      
       Dialog.confirm({
         message: this.$t('multimedia.undoSendTips'),
         className: 'mqu-dialog',
         cancelButtonText: this.$t('multimedia.waitAMoment'),
         confirmButtonText: this.$t('multimedia.cancelUpload'),
       }).then(() => {
-        this.resetUpload();
-        
         deleteTask({
           id: this.serverTaskId
         }).then(res => {
@@ -1064,8 +1075,12 @@ export default {
         }).catch(err => {
           window.console.log(err);
         });
+        
+        this.resetUpload();
       }).catch(() => {
-        // 左侧按钮（不执行）
+        // 左侧按钮，继续上传
+        this.stopUpload = false;
+        this.verdictUploadComplete();
       });
     },
     
@@ -1076,11 +1091,15 @@ export default {
       this.submitProgress = 0;
       this.submittedNum = 0;
       this.serverTaskId = '';
+      this.stopUpload = false;
+      Dialog.close();
     },
     
     // 判断当前是否全部上传完成
     verdictUploadComplete() {
-      if (this.submittedNum>=this.curMediaList.length && this.submitProgress>=100) {
+      if (!this.showUploadingPopup) return false;
+      
+      if (this.submittedNum>=this.curMediaList.length && this.submitProgress>=100 && !this.stopUpload) {
         performTask({
           id: this.serverTaskId
         }).then(res => {
@@ -1088,8 +1107,9 @@ export default {
           
           if (!this.showUploadingPopup) return false;
           
-          if (res.errcode === 0) {
+          if (res.errcode == 0) {
             // 最终完成！
+            Dialog.close();
           } else {
             Toast(this.$t('multimedia.failedToSend'));
             this.resetUpload();
@@ -1130,17 +1150,18 @@ export default {
       
       this.uploader = window.WebUploader.create({
         swf: this.$baseUrl + 'lib/webuploader/Uploader.swf', // 请根据实际项目部署路径配置swf文件路径
-        server: this.baseURL + '/resources/upload', // 文件接收服务端
+        server: this.baseURL + '/resource/upload', // 文件接收服务端
         thumb: false, // 不生成缩略图
         compress: false, // 如果此选项为false, 则图片在上传前不进行压缩
         prepareNextFile: true, // 是否允许在文件传输时提前把下一个文件准备好
         chunked: true, // 分片上传
       });
       
-      this.curMediaList.map(item => {
+      this.curMediaList.map((item, index) => {
         if (item.type==='img' || item.type==='video') {
           let wuFile = new window.WebUploader.Lib.File(window.WebUploader.guid('rt_'), item.data.file);
           let newfile = new window.WebUploader.File(wuFile);
+          newfile.extraIndex = index + 1;
           
           this.uploader.addFiles(newfile);
           wuFile = null;
@@ -1164,23 +1185,25 @@ export default {
     wuUpload() {
       if (!this.uploader) return false;
       
-      this.uploader.on('uploadBeforeSend', (block, data) => {
-        window.console.log(`${block.file.name} uploadBeforeSend !`);
-        
-        data.md5 = block.file.md5; // 分片额外传md5参数
-      });
-      
       this.uploader.on('uploadStart', (file) => {
         window.console.log(`${file.name} uploadStart !`);
         
-        file.kind = this.imgAcceptReg.test(file.type) ? '2' : '1'; // 分片额外传资源类型参数（资源类型 1:视频 2:图片）
-        file.taskId = this.serverTaskId; // 分片额外传任务ID参数
-        file.index = this.curMediaList.findIndex(item => item.data.file.name === file.name); // 分片额外传播放序号参数
+        file.extraKind = this.imgAcceptReg.test(file.type) ? '2' : '1'; // 分片额外传资源类型参数（资源类型 1:视频 2:图片）
+        file.extraTaskId = this.serverTaskId; // 分片额外传任务ID参数
       });
       
-      this.uploader.on('uploadProgress', (file, percentage) => {
-        window.console.log(`${file.name} uploadProgress percentage：`, percentage);
+      this.uploader.on('uploadBeforeSend', (block, data) => {
+        window.console.log(`${block.file.name} uploadBeforeSend !`);
+        
+        data.md5 = block.file.extraMd5; // 分片额外传md5参数
+        data.kind = block.file.extraKind; // 分片额外传资源类型参数（资源类型 1:视频 2:图片）
+        data.taskId = block.file.extraTaskId; // 分片额外传任务ID参数
+        data.index = block.file.extraIndex; // 分片额外传播放序号参数
       });
+      
+      /*this.uploader.on('uploadProgress', (file, percentage) => {
+        window.console.log(`${file.name} uploadProgress percentage：`, percentage);
+      });*/
       
       this.uploader.on('uploadError', (file, reason) => {
         window.console.log(`${file.name} uploadError reason：`, reason);
@@ -1193,7 +1216,7 @@ export default {
         window.console.log(`${file.name} uploadSuccess response：`, response);
         
         if (response.msg === 'success') {
-          this.submitProgress = Math.floor((1 + ++this.submittedNum)/this.curMediaList.length*100);
+          this.submitProgress = Math.floor(++this.submittedNum/this.curMediaList.length*100);
           this.verdictUploadComplete();
         } else if (response.msg === 'upload_chunk') {
           // 分片文件上传成功时返回，啥也不做
@@ -1203,9 +1226,9 @@ export default {
         }
       });
       
-      this.uploader.on('uploadComplete', (file) => {
+      /*this.uploader.on('uploadComplete', (file) => {
         window.console.log(`${file.name} uploadComplete !`);
-      });
+      });*/
       
       this.uploader.on('error', (type) => {
         window.console.log(`errorType：`, type);

@@ -103,13 +103,13 @@ export function uploadNonFile(options) {
     taskId: options.taskId,
     content: options.content,
     index: options.index,
-    contentType: 'multipart',
+    //contentType: 'multipart',
   };
   
   if (options.name) data.name = options.name;
   
   return request({
-    url: '/resources/uploadNonFile',
+    url: '/resource/uploadNonFile',
     method: 'post',
     data
   });
