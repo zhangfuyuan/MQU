@@ -37,6 +37,9 @@ module.exports = {
 		returnHome: 'Return home',
 		waitAMoment: 'Wait a moment',
 		failedToSend: 'Network exception, failed to send',
+		send: 'Send',
+		sentSuccessfully: 'Sent successfully',
+		edit: 'Edit',
 	},
 	quickUpload: {
 		title: 'Quick upload',

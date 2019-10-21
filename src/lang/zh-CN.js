@@ -37,6 +37,9 @@ module.exports = {
 		returnHome: '返回首页',
 		waitAMoment: '再等片刻',
 		failedToSend: '网络异常 , 发送失败',
+		send: '发送',
+		sentSuccessfully: '发送成功',
+		edit: '编辑',
 	},
 	quickUpload: {
 		title: '快传',

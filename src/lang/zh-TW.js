@@ -37,6 +37,9 @@ module.exports = {
 		returnHome: '返回首頁',
 		waitAMoment: '再等片刻',
 		failedToSend: '網絡異常 , 發送失敗',
+		send: '發送',
+		sentSuccessfully: '發送成功',
+		edit: '編輯',
 	},
 	quickUpload: {
 		title: '快傳',

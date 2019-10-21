@@ -186,7 +186,7 @@
           size="large"
           :disabled="!canUpload" 
           @click="startUpload"
-        >{{$t('multimedia.upload')}}</van-button>
+        >{{$t('multimedia.send')}}</van-button>
       </div>
     </div>
     
@@ -201,7 +201,7 @@
       <!-- 顶部取消、完成操作 -->
       <div class="top">
         <div>
-          <span class="top-cancel" @click="showTextEditPopup = false;">{{$t('common.cancel')}}</span>
+          <span class="top-cancel" @click="cancelEdit">{{$t('common.cancel')}}</span>
           <span class="top-done" @click="textEditDone">{{$t('common.done')}}</span>
         </div>
       </div>
@@ -496,7 +496,7 @@ export default {
   watch: {},
 
   created() {
-    document.title = this.$t(document.title);
+    document.title = this.$t('multimedia.title');
     this.resizeWin();
   },
   
@@ -561,6 +561,7 @@ export default {
       this.wuDestroy();
       this.serverTaskId = '';
       this.stopUpload = false;
+      document.title = this.$t('multimedia.title');
     },
     
     // 添加 “图片/视频”
@@ -780,6 +781,7 @@ export default {
       this.styleOpacitySlider = this.tempTextEditData.opacity * 100;
       this.styleWeightChecked = this.tempTextEditData.weight === 'bold';
       this.styleShadowChecked = this.tempTextEditData.shadow === '0 2px 3px';
+      document.title = this.$t('multimedia.edit');
       
       this.$nextTick(() => {
         if (this.isIOS) {
@@ -828,6 +830,7 @@ export default {
       this.styleColorSlider = this.styleColorList.indexOf(this.tempTextEditData.color);
       this.styleWeightChecked = this.tempTextEditData.weight === 'bold';
       this.styleShadowChecked = this.tempTextEditData.shadow === '0 2px 3px';
+      document.title = this.$t('multimedia.edit');
       
       this.$nextTick(() => {
         if (this.isIOS) {
@@ -840,6 +843,12 @@ export default {
       });
     },
     
+    // 取消跑马灯/文本编辑
+    cancelEdit() {
+      this.showTextEditPopup = false;
+      document.title = this.$t('multimedia.title');
+    },
+    
     // 完成跑马灯/文本编辑
     textEditDone() {
       this.curMediaList[this.curMediaIndex].data.content = this.tempTextEditData.content;
@@ -849,6 +858,7 @@ export default {
       this.curMediaList[this.curMediaIndex].data.weight = this.tempTextEditData.weight;
       this.curMediaList[this.curMediaIndex].data.shadow = this.tempTextEditData.shadow;
       this.showTextEditPopup = false;
+      document.title = this.$t('multimedia.title');
     },
     
     // 删除多媒体
@@ -974,6 +984,7 @@ export default {
       }
       
       this.showUploadingPopup = true;
+      document.title = this.$t('multimedia.beSending');
       
       // 创建任务
       createTask({
@@ -1093,6 +1104,7 @@ export default {
       this.serverTaskId = '';
       this.stopUpload = false;
       Dialog.close();
+      document.title = this.$t('multimedia.title');
     },
     
     // 判断当前是否全部上传完成
@@ -1109,6 +1121,7 @@ export default {
           
           if (res.errcode == 0) {
             // 最终完成！
+            document.title = this.$t('multimedia.sentSuccessfully');
             Dialog.close();
           } else {
             Toast(this.$t('multimedia.failedToSend'));
