@@ -1,5 +1,5 @@
 <template>
-  <div class="multimedia">
+  <div :class="['multimedia', { 'is-ios': isIOS, 'is-landscape': isLandscape  }]">
     <div class="multi-top">
       <div class="top">
         <!-- 顶部标题 -->
@@ -192,16 +192,18 @@
     
     <!-- 编辑跑马灯/文本信息 -->
     <van-popup
-      class="multi-edit"
+      class="multi-edit mqu-popup"
       v-model="showTextEditPopup"
+      :duration="0"
       position="right"
-      :style="{ height: '100%', width: '100%' }"
+      :style="{ minHeight: '100%', width: '100%' }"
       :close-on-click-overlay="false"
     >
       <!-- 顶部取消、完成操作 -->
       <div class="top">
         <div>
           <span class="top-cancel" @click="cancelEdit">{{$t('common.cancel')}}</span>
+          <span class="top-length">{{tempTextEditData.content.length}}/{{curMediaList.length>0&&curMediaIndex>-1&&curMediaList[curMediaIndex].type==='run' ? runLengthLimit : txtLengthLimit}}</span>
           <span class="top-done" @click="textEditDone">{{$t('common.done')}}</span>
         </div>
       </div>
@@ -209,13 +211,14 @@
       <!-- 输入文本框 -->
       <div 
         v-if="curMediaList.length>0 && curMediaIndex>-1" 
-        :class="['field', { 'is-ios': isIOS }]" >
+        class="field" 
+      >
         <van-field
           ref="editField"
           class="mqu-field mqu-field-fill"
           v-model="tempTextEditData.content"
           type="textarea"
-          :maxlength="curMediaList[curMediaIndex].type==='run' ? 80 : 240"
+          :maxlength="curMediaList[curMediaIndex].type==='run' ? runLengthLimit : txtLengthLimit"
           :placeholder="$t('multimedia.clickInput')"
           :style="{ 
             color: tempTextEditData.content ? convertRGBA(tempTextEditData.color, curMediaList[curMediaIndex].type==='run'&&tempTextEditData.content ? tempTextEditData.opacity : '1') : '#333333',
@@ -231,7 +234,8 @@
       <!-- 切换栏 -->
       <div 
         v-if="curMediaList.length>0 && curMediaIndex>-1" 
-        :class="['bar', { 'is-ios': isIOS, 'is-landscape': isLandscape }]" 
+        class="bar" 
+        :style="{ marginBottom: (isMiuiBrowser&&!isShowTabStyle ? 50 : 0) + 'px' }" 
       >
         <van-row class="bar-tab" type="flex" justify="center">
           <van-col span="12" :class="['bar-tab-keyboard', { 'active': isShowTabStyle===false }]" @click.native="$refs['editField'].focus();">
@@ -248,7 +252,7 @@
         </van-row>
         
         <!-- 样式栏 -->
-        <div id="editBarCont" class="bar-cont" >
+        <div class="bar-cont" :style="{ height: (editBarContHeight/75) + 'rem' }">
           <template v-if="isShowTabStyle">
             <!-- 颜色 -->
             <div class="style-color">
@@ -334,10 +338,11 @@
     
     <!-- 提交后台 -->
     <van-popup
-      class="multi-submit"
+      class="multi-submit mqu-popup"
       v-model="showUploadingPopup"
+      :duration="0"
       position="right"
-      :style="{ height: '100%', width: '100%' }"
+      :style="{ minHeight: '100%', width: '100%' }"
       :close-on-click-overlay="false"
     >
       <!-- 上传完成 -->
@@ -389,6 +394,7 @@
 import { Row, Col, Button, Toast, Uploader, Image, Progress, Icon, Dialog, Field, Popup, Slider, Switch } from 'vant';
 import baseURL from '@/api/config';
 import { createTask, deleteTask, performTask, uploadNonFile } from '@/api/multimedia';
+import { myMixin } from '@/utils/mixins';
 
 Toast.setDefaultOptions({
   className: 'mqu-toast',
@@ -397,7 +403,7 @@ Toast.setDefaultOptions({
 export default {
   name: 'multimedia',
 
-  mixins: [],
+  mixins: [ myMixin ],
 
   components: {
     [Row.name]: Row,
@@ -445,7 +451,9 @@ export default {
         weight: 'normal', // ON 为 bold
         shadow: '0 0 0', // ON 为 0 2px 3px
       }, // 缓存编辑跑马灯/文本的信息，未点击“完成”不进行更新（动态）
-      isIOS: /(\(i[^;]+;( U;)? CPU.+Mac OS X)|(iPhone)|(iPad)/i.test(navigator.userAgent), // 判断是否iOS系统
+      isIOS: /(\(i[^;]+;( U;)? CPU.+Mac OS X)|(iPhone)|(iPad)|(iPod)/i.test(navigator.userAgent), // 判断是否iOS系统
+      isMiuiBrowser: /MiuiBrowser/i.test(navigator.userAgent), // 判断是否小米浏览器
+      oIsLandscape: (window.orientation==90 || window.orientation==-90), // 初始化时设备是否为横屏
       isLandscape: (window.orientation==90 || window.orientation==-90), // 是否横屏
       isShowTabStyle: false, // 编辑文本界面是否激活 “样式” Tab（动态）
       styleColorList: ['#ffffff','#9a9791','#6a6663','#34302f','#333333','#2d2824','#191814','#a86e35','#7e0e14','#c20e17','#e51b27','#e4451f','#ea7527','#f1c03c','#b4da4b','#7eb63e','#33862e','#88d9f3','#0994f5','#1064d4','#1b1c6f','#381a6c','#76128d','#e43b86','#f1cdd5'],
@@ -455,12 +463,12 @@ export default {
       styleShadowChecked: false, // 是否阴影（动态）
       submitProgress: 0, // 当前提交后台的上传进度（动态）
       submittedNum: 0, // 当前已提交后台的内容数量（动态）
-      oIsLandscape: (window.orientation==90 || window.orientation==-90), // 初始化时设备是否为横屏
-      oWidth: parseInt(document.documentElement.clientWidth||document.body.clientWidth), // 初始化时页面宽度
-      oHeight: parseInt(document.documentElement.clientHeight||document.body.clientHeight), // 初始化时页面高度
       uploader: null, // WebUploader 实例对象（动态）
-      serverTaskId: '', // 后台任务ID
-      stopUpload: false, // 是否暂停上传
+      serverTaskId: '', // 后台任务ID（动态）
+      stopUpload: false, // 是否暂停上传（动态）
+      isPageExpired: false, // 网页是否过期
+      runLengthLimit: 80, // 跑马灯输入文字长度限制
+      txtLengthLimit: 240, // 跑马灯输入文字长度限制
     }
   },
 
@@ -481,8 +489,23 @@ export default {
       
       this.curMediaList.map((item) => item.type && ++_map[item.type] || 0);
       
-      window.console.log('更新已添加多媒体：', _map);
+      // window.console.log('更新已添加多媒体：', _map);
       return _map;
+    },
+    
+    // 编辑页面样式内容高度
+    editBarContHeight() {
+      const _scrollHeight = document.body.scrollHeight || document.documentElement.scrollHeight;
+      const _scrollWidth = document.body.scrollWidth || document.documentElement.scrollWidth;
+      let _height = 0;
+      
+      if (this.isIOS) {
+        _height = (!this.oIsLandscape&&this.isLandscape ? _scrollWidth : _scrollHeight) - (this.isLandscape ? -80 : (screen.height==812&&screen.width==375 ? -20 : 30));
+      } else {
+        _height = this.isShowTabStyle ? (this.isLandscape ? 315 : 415) : 3;
+      }
+      
+      return _height;
     }
   },
 
@@ -497,41 +520,68 @@ export default {
 
   created() {
     document.title = this.$t('multimedia.title');
-    this.resizeWin();
-  },
-  
-  beforeRouteLeave (to, from , next) {
-    const answer = window.confirm('Do you really want to leave?');
-    
-    if (answer) {
-      next();
-    } else {
-      next(false);
-    }
   },
   
   mounted() {
+    // 屏幕旋转
     window.$(window).on('orientationchange.orientationchange', () => {
       this.isLandscape = (window.orientation==90 || window.orientation==-90);
-    }).on('resize.keyboard', () => {
-      let rIsLandscape = (window.orientation==90 || window.orientation==-90);
-      let rHeight = parseInt(document.documentElement.clientHeight||document.body.clientHeight);
-      let dHeight = (this.oIsLandscape==rIsLandscape ? this.oHeight : this.oWidth) - rHeight;
-      
-      if (dHeight > 200) {
-        // 视图显示高度变小超过200，可以看作软键盘显示了
-        window.$('#editBarCont').css('height', dHeight + 1 + 'px');
-      }
-      
-      this.resizeWin();
     });
+    
+    // 网页访问6小时后过期
+    window.setTimeout(() => {
+      this.isPageExpired = true;
+      
+      this.$router.replace({
+        path: '/error',
+        query: {
+          type: 'pageExpired'
+        }
+      });
+    }, 6*60*60000);
   },
-
+  
   destroyed() {
-    window.$(window).off('.orientationchange .keyboard');
+    window.$(window).off('.orientationchange');
     this.wuDestroy();
   },
-
+  
+  beforeRouteEnter (to, from, next) {
+    try {
+      const qrTimestamp = new Date(Number(to.query.timestamp)).getTime();
+      const nowTimestamp = Date.now();
+      
+      if (nowTimestamp-qrTimestamp > 10*60000) {
+        // 二维码生成10分钟后过期
+        next({
+            path: '/error',
+            query: {
+              type: 'qrExpired'
+            }
+        });
+      } else {
+        next();
+      }
+    } catch (err) {
+      next();
+      Toast(err);
+    }
+  },
+  
+  beforeRouteLeave (to, from , next) {
+    if (this.isPageExpired) {
+      next();
+    } else {
+      const answer = window.confirm('Do you really want to leave?');
+      
+      if (answer) {
+        next();
+      } else {
+        next(false);
+      }
+    }
+  },
+  
   methods: {
     // 重置 data 变量
     reset() {
@@ -746,11 +796,11 @@ export default {
       const _index = this.curMediaList.findIndex(item => item.type === 'run');
       
       if (_index > -1) {
+        this.curMediaIndex = _index;
         Toast(this.$t('multimedia.addRunLimitTips'));
         return false;
       }
       
-      this.curMediaIndex = [this.curMediaList.length-1];
       this.curMediaList.push({
         type: 'run',
         data: {
@@ -761,7 +811,7 @@ export default {
           shadow: '0 0 0',
         },
       });
-      this.curMediaIndex++;
+      this.curMediaIndex = this.curMediaList.length - 1;
       this.styleColorSlider = 4;
       this.styleOpacitySlider = 100;
       this.styleWeightChecked = false;
@@ -799,11 +849,11 @@ export default {
       const _index = this.curMediaList.findIndex(item => item.type === 'txt');
       
       if (_index > -1) {
+        this.curMediaIndex = _index;
         Toast(this.$t('multimedia.addTxtLimitTips'));
         return false;
       }
       
-      this.curMediaIndex = [this.curMediaList.length-1];
       this.curMediaList.push({
         type: 'txt',
         data: {
@@ -813,7 +863,7 @@ export default {
           shadow: '0 0 0',
         },
       });
-      this.curMediaIndex++;
+      this.curMediaIndex = this.curMediaList.length - 1;
       this.styleColorSlider = 4;
       this.styleWeightChecked = false;
       this.styleShadowChecked = false;
@@ -975,7 +1025,7 @@ export default {
       }
       
       const _teid = this.$route.query.teid;
-      window.console.log(`终端ID：${_teid}`);
+      // window.console.log(`终端ID：${_teid}`);
       
       if (!_teid) {
         Toast(this.$t('multimedia.failedToSend'));
@@ -992,7 +1042,7 @@ export default {
         type: '1',
         teid: _teid,
       }).then(res => {
-        window.console.log(res);
+        // window.console.log(res);
         
         if (!this.showUploadingPopup) return false;
         
@@ -1077,12 +1127,12 @@ export default {
         message: this.$t('multimedia.undoSendTips'),
         className: 'mqu-dialog',
         cancelButtonText: this.$t('multimedia.waitAMoment'),
-        confirmButtonText: this.$t('multimedia.cancelUpload'),
+        confirmButtonText: this.$t('multimedia.undoSend'),
       }).then(() => {
         deleteTask({
           id: this.serverTaskId
-        }).then(res => {
-          window.console.log(res);
+        }).then((/*res*/) => {
+          // window.console.log(res);
         }).catch(err => {
           window.console.log(err);
         });
@@ -1115,7 +1165,7 @@ export default {
         performTask({
           id: this.serverTaskId
         }).then(res => {
-          window.console.log(res);
+          // window.console.log(res);
           
           if (!this.showUploadingPopup) return false;
           
@@ -1141,7 +1191,7 @@ export default {
     uploadRunOrTxt(options) {
       return new Promise((resolve, reject) => {
         uploadNonFile(options).then(res => {
-          window.console.log(res);
+          // window.console.log(res);
           
           if (res.msg === 'success') {
             resolve();
@@ -1188,10 +1238,10 @@ export default {
         this.wuUpload();
       }
       
-      window.console.log('curMediaList：', this.curMediaList);
-      window.console.log('swfURL：', this.$baseUrl + 'lib/webuploader/Uploader.swf');
-      window.console.log('uploader：', this.uploader);
-      window.console.log('uFiles：', uFiles);
+      // window.console.log('curMediaList：', this.curMediaList);
+      // window.console.log('swfURL：', this.$baseUrl + 'lib/webuploader/Uploader.swf');
+      // window.console.log('uploader：', this.uploader);
+      // window.console.log('uFiles：', uFiles);
     },
     
     // 触发 WebUploader 上传图片/视频资源
@@ -1199,14 +1249,14 @@ export default {
       if (!this.uploader) return false;
       
       this.uploader.on('uploadStart', (file) => {
-        window.console.log(`${file.name} uploadStart !`);
+        // window.console.log(`${file.name} uploadStart !`);
         
         file.extraKind = this.imgAcceptReg.test(file.type) ? '2' : '1'; // 分片额外传资源类型参数（资源类型 1:视频 2:图片）
         file.extraTaskId = this.serverTaskId; // 分片额外传任务ID参数
       });
       
       this.uploader.on('uploadBeforeSend', (block, data) => {
-        window.console.log(`${block.file.name} uploadBeforeSend !`);
+        // window.console.log(`${block.file.name} uploadBeforeSend !`);
         
         data.md5 = block.file.extraMd5; // 分片额外传md5参数
         data.kind = block.file.extraKind; // 分片额外传资源类型参数（资源类型 1:视频 2:图片）
@@ -1215,7 +1265,7 @@ export default {
       });
       
       /*this.uploader.on('uploadProgress', (file, percentage) => {
-        window.console.log(`${file.name} uploadProgress percentage：`, percentage);
+        // window.console.log(`${file.name} uploadProgress percentage：`, percentage);
       });*/
       
       this.uploader.on('uploadError', (file, reason) => {
@@ -1226,7 +1276,7 @@ export default {
       });
       
       this.uploader.on('uploadSuccess', (file, response) => {
-        window.console.log(`${file.name} uploadSuccess response：`, response);
+        // window.console.log(`${file.name} uploadSuccess response：`, response);
         
         if (response.msg === 'success') {
           this.submitProgress = Math.floor(++this.submittedNum/this.curMediaList.length*100);
@@ -1240,7 +1290,7 @@ export default {
       });
       
       /*this.uploader.on('uploadComplete', (file) => {
-        window.console.log(`${file.name} uploadComplete !`);
+        // window.console.log(`${file.name} uploadComplete !`);
       });*/
       
       this.uploader.on('error', (type) => {
@@ -1262,18 +1312,6 @@ export default {
     },
     
     /******************************* WebUploader API END *******************************/
-    
-    // 窗口大小发生变化处理函数
-    resizeWin() {
-      // 移动端百分比适配布局极端值处理
-      let deviceWidth = document.documentElement.clientWidth || document.body.clientWidth;
-      
-      if (375 < deviceWidth && deviceWidth < 750) {
-        document.documentElement.style.fontSize = '37.5px';
-      } else if (750 <= deviceWidth) {
-        document.documentElement.style.fontSize = '75px';
-      }
-    },
   }
 };
 </script>
@@ -1282,10 +1320,6 @@ export default {
 @import '../../styles/var';
 
 @active-bgcolor: #e6f4ff;
-@edit-bar-cont-height: 206PX;
-@edit-bar-cont-height-landscape: 210PX;
-@edit-bar-cont-height-ios: 261PX;
-@edit-bar-cont-height-ios-landscape: 245PX;
 
 .multimedia {
   width: 100%;
@@ -1527,7 +1561,7 @@ export default {
       }
     }
     
-    .top-cancel {
+    .top-cancel, .top-length {
       font-size: 28px;
       color: @mqu-text-color333;
     }
@@ -1539,14 +1573,17 @@ export default {
     
     /* 输入文本框 */
     .field {
-      padding: 30px 30PX;
+      padding: 0;
       width: 100%;
+      min-height: 60px;
+      position: relative;
       flex: 1;
       transition: all .4s cubic-bezier(.4,0,0,1);
     }
     
     .mqu-field {
-      padding: 0;
+      position: absolute;
+      padding: 30px 30PX;
     }
     
     /* 样式栏 */
@@ -1584,7 +1621,6 @@ export default {
       .mixin-flex-column-around();
       padding: 0 30PX;
       width: 100%;
-      height: @edit-bar-cont-height;
       background-color: #fff;
       box-sizing: border-box;
       transition: all .4s cubic-bezier(.4,0,0,1);
@@ -1594,18 +1630,6 @@ export default {
         width: 100%;
         box-sizing: border-box;
       }
-    }
-    
-    .is-landscape .bar-cont {
-      height: @edit-bar-cont-height-landscape;
-    }
-    
-    .is-ios .bar-cont {
-      height: @edit-bar-cont-height-ios;
-    }
-    
-    .is-ios.is-landscape .bar-cont {
-      height: @edit-bar-cont-height-ios-landscape;
     }
     
     .style-label {
@@ -1762,6 +1786,10 @@ export default {
       height: 179px;
       margin-bottom: 62px;
     }
+  }
+  
+  &.is-landscape .mqu-field {
+    padding: 0 30PX;
   }
 }
 </style>

@@ -44,4 +44,10 @@ module.exports = {
 	quickUpload: {
 		title: '快傳',
 	},
+	error: {
+		qrExpired: '二維碼已過期',
+		qrExpiredTips: '二維碼過期，請重新掃碼',
+		pageExpired: '網頁已過期',
+		pageExpiredTips: '網頁過期，請重新掃碼',
+	},
 }

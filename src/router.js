@@ -8,14 +8,16 @@ const routes = [
     path: '*',
     redirect: '/home'
   },
-	{
+  {
+    path: '/home',
     name: 'home',
     component: () => import('./views/home'),
     meta: {
       title: 'MQU'
     }
-	},
+  },
   {
+    path: '/multimedia',
     name: 'multimedia',
     component: () => import('./views/multimedia'),
     meta: {
@@ -23,12 +25,21 @@ const routes = [
     }
   },
   {
-    name: 'quick-upload',
+    path: '/quickUpload',
+    name: 'quickUpload',
     component: () => import('./views/quickUpload'),
     meta: {
       title: 'quickUpload.title'
     }
   },
+  {
+    path: '/error',
+    name: 'error',
+    component: () => import('./views/error'),
+    meta: {
+      title: 'error.qrExpired'
+    }
+  }
 ];
 
 // add route path
@@ -37,8 +48,8 @@ routes.forEach(route => {
 });
 
 const router = new Router({ 
-	scrollBehavior: () => ({ y: 0 }),
-	routes 
+  scrollBehavior: () => ({ y: 0 }),
+  routes 
 });
 
 router.beforeEach((to, from, next) => {

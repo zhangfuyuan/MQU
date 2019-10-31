@@ -44,4 +44,10 @@ module.exports = {
 	quickUpload: {
 		title: '快传',
 	},
+	error: {
+		qrExpired: '二维码已过期',
+		qrExpiredTips: '二维码过期，请重新扫码',
+		pageExpired: '网页已过期',
+		pageExpiredTips: '网页过期，请重新扫码',
+	},
 }

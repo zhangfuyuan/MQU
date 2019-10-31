@@ -26,6 +26,7 @@
     "less": "^3.8.1",
     "less-loader": "^5.0.0",
     "postcss-pxtorem": "^4.0.1",
+    "vconsole": "^3.3.4",
     "vue-cli-plugin-axios": "0.0.4",
     "vue-template-compiler": "^2.6.10"
   },

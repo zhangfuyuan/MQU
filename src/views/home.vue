@@ -18,7 +18,7 @@
 import { Row, Col, Button } from 'vant';
 
 export default {
-	name: '',
+	name: 'home',
 
 	mixins: [],
 

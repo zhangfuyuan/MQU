@@ -1,158 +1,166 @@
 /* 重构 vant 组件样式 */
 .mqu-toast {
-	padding: 25px !important;
-	min-width: 150px !important;
-	background-color: #000 !important;
-	font-size: 24px !important;
-	line-height: 1.25 !important;
-	color: #fff !important;
-	border-radius: 50px !important;
-	opacity: .6 !important;
-	box-shadow: 0 3px 6px #000 !important;
+  padding: 25px !important;
+  min-width: 150px !important;
+  background-color: #000 !important;
+  font-size: 24px !important;
+  line-height: 1.25 !important;
+  color: #fff !important;
+  border-radius: 50px !important;
+  opacity: .6 !important;
+  box-shadow: 0 3px 6px #000 !important;
 }
 
 .van-progress__portion {
-	transition: all 1s cubic-bezier(.4,0,0,1) !important;
+  transition: all 1s cubic-bezier(.4,0,0,1) !important;
 }
 
 .mqu-dialog {
-	border-radius: 10px !important;
-	width: 570px !important;
-	
-	.van-dialog__content {
-		padding: 70px 40px 30px;
-		
-		.van-dialog__message {
-			font-size: 30px;
-			line-height: 30px;
-			color: #333;
-		}
-	}
-	
-	.van-dialog__footer {
-		padding: 35px 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		
-		.van-dialog__cancel, .van-dialog__confirm {
-			padding: 15px 24px 12px;
-			width: auto;
-			height: auto;
-			font-size: 28px;
-			line-height: 28px;
-			border-radius: 50px;
-			background-color: #fff;
-			background: #fff;
-			flex: none;
-			
-			.van-button__text {
-				font-size: 28px;
-				line-height: 28px;
-			}
-		}
-		
-		/* 左边按钮 */
-		.van-dialog__cancel {
-			border: 2px solid #008fff;
-			margin-right: 50px;
-			
-			.van-button__text {
-				color: #008fff;
-			}
-			
-			&:active {
-				background-color: #008fff;
-				background: #008fff;
-				
-				.van-button__text {
-					color: #fff;
-				}
-			}
-		}
-		
-		/* 右边按钮 */
-		.van-dialog__confirm {
-			border: 2.5px solid #da261c;
-			
-			.van-button__text {
-				color: #da261c;
-			}
-			
-			&:active {
-				background-color: #da261c;
-				background: #da261c;
-				
-				.van-button__text {
-					color: #fff;
-				}
-			}
-		}
-		
-		&::after {
-			border-color: #fff;
-		}
-	}
+  border-radius: 10px !important;
+  width: 570px !important;
+  
+  .van-dialog__content {
+    padding: 70px 40px 30px;
+    
+    .van-dialog__message {
+      font-size: 30px;
+      line-height: 30px;
+      color: #333;
+    }
+  }
+  
+  .van-dialog__footer {
+    padding: 35px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    .van-dialog__cancel, .van-dialog__confirm {
+      padding: 15px 24px 12px;
+      width: auto;
+      height: auto;
+      font-size: 28px;
+      line-height: 28px;
+      border-radius: 50px;
+      background-color: #fff;
+      background: #fff;
+      flex: none;
+      
+      .van-button__text {
+        font-size: 28px;
+        line-height: 28px;
+      }
+    }
+    
+    /* 左边按钮 */
+    .van-dialog__cancel {
+      border: 2px solid #008fff;
+      margin-right: 50px;
+      
+      .van-button__text {
+        color: #008fff;
+      }
+      
+      &:active {
+        background-color: #008fff;
+        background: #008fff;
+        
+        .van-button__text {
+          color: #fff;
+        }
+      }
+    }
+    
+    /* 右边按钮 */
+    .van-dialog__confirm {
+      border: 2.5px solid #da261c;
+      
+      .van-button__text {
+        color: #da261c;
+      }
+      
+      &:active {
+        background-color: #da261c;
+        background: #da261c;
+        
+        .van-button__text {
+          color: #fff;
+        }
+      }
+    }
+    
+    &::after {
+      border-color: #fff;
+    }
+  }
 }
 
 .mqu-field {
-	
-	.van-cell__value, .van-field__body, .van-field__control {
-		color: inherit !important;
-		opacity: inherit !important;
-		font-weight: inherit !important;
-		text-shadow: inherit !important;
-	}
-	
-	.van-field__control {
-		height: 365px !important;
-		font-size: 30px !important;
-		line-height: 30px !important;
-	}
-	
-	/* 针对缺省样式 (必须的) */
-	::-webkit-scrollbar {
-		width: 10px;
-		height: 0px;
-	}
-	/* 滚动条的滑轨背景颜色 */
-	::-webkit-scrollbar-track {
-		background-color: #fff;
-		border-radius: 5px;
-	}
-	/* 滑块颜色 */
-	::-webkit-scrollbar-thumb {
-		background-color: #dce8ff;
-		border-radius: 5px;
-	}
-	/*内层轨道的颜色*/
-	::-webkit-scrollbar-track-piece{
-		background-color: #fff;
-		border-radius: 5px;
-	}
-	/* 滑轨两头的监听按钮颜色 */
-	::-webkit-scrollbar-button {
-		background-color: #fff;
-		width: 0;
-		height: 0;
-	}
-	/* 横向滚动条和纵向滚动条相交处尖角的颜色 */
-	::-webkit-scrollbar-corner {
-		background-color: #fff;
-	}
+  
+  .van-cell__value, .van-field__body, .van-field__control {
+    color: inherit !important;
+    opacity: inherit !important;
+    font-weight: inherit !important;
+    text-shadow: inherit !important;
+  }
+  
+  .van-field__control {
+    height: 365px !important;
+    font-size: 30px !important;
+    line-height: 30px !important;
+  }
+  
+  /* 针对缺省样式 (必须的) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 0px;
+  }
+  /* 滚动条的滑轨背景颜色 */
+  ::-webkit-scrollbar-track {
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  /* 滑块颜色 */
+  ::-webkit-scrollbar-thumb {
+    background-color: #dce8ff;
+    border-radius: 5px;
+  }
+  /*内层轨道的颜色*/
+  ::-webkit-scrollbar-track-piece{
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  /* 滑轨两头的监听按钮颜色 */
+  ::-webkit-scrollbar-button {
+    background-color: #fff;
+    width: 0;
+    height: 0;
+  }
+  /* 横向滚动条和纵向滚动条相交处尖角的颜色 */
+  ::-webkit-scrollbar-corner {
+    background-color: #fff;
+  }
 }
 
 .mqu-field-fill {
-	height: 100% !important;
-	
-	.van-cell__value, .van-field__body, .van-field__control {
-		height: 100% !important;
-	}
+  height: 100% !important;
+  
+  .van-cell__value, .van-field__body, .van-field__control {
+    height: 100% !important;
+  }
 }
 
 .mqu-slider {
-	.van-slider__button {
-		width: 36px !important;
-		height: 36px !important;
-	}
+  .van-slider__button {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
+.mqu-popup {
+  top: unset !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: unset !important;
 }

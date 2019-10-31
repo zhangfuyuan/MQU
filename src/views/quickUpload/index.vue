@@ -6,7 +6,7 @@
 
 <script>
 export default {
-	name: 'quick-upload',
+	name: 'quickUpload',
 
 	mixins: [],
 

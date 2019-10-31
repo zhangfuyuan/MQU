@@ -44,4 +44,10 @@ module.exports = {
 	quickUpload: {
 		title: 'Quick upload',
 	},
+	error: {
+		qrExpired: 'Qr code expired',
+		qrExpiredTips: 'Qr code expired, please scan the code again',
+		pageExpired: 'Page expired',
+		pageExpiredTips: 'Page expired, please scan the code again',
+	},
 }
