@@ -8,7 +8,7 @@
 		
 		<van-row type="flex" justify="center">
 			<van-col span="20">
-				<van-button class="home-btn" round type="info" size="large" to="/quick-upload">{{$t('quickUpload.title')}}</van-button>
+				<van-button class="home-btn" round type="info" size="large" to="/quickUpload">{{$t('quickUpload.title')}}</van-button>
 			</van-col>
 		</van-row>
 	</div>

@@ -8,7 +8,7 @@ import VConsole from 'vconsole';
 
 Vue.prototype.$baseUrl = process.env.BASE_URL;
 
-if (process.env.NODE_ENV!=='production' || /vconsole=1/i.test(window.location.href)) {
+if (process.env.NODE_ENV!=='production' || /vc=1/i.test(window.location.href)) {
   new VConsole();
 }
 

@@ -24,7 +24,7 @@ export default {
         let deferred = window.WebUploader.Deferred();
 
         (new window.WebUploader.Uploader()).md5File(file).then((val) => {
-          window.console.log(`${file.name} md5：${val}`);
+          // window.console.log(`${file.name} md5：${val}`);
 
           file.extraMd5 = val;
           return deferred.resolve();
@@ -53,6 +53,7 @@ body {
   background-color: #f8f8f8;
   -webkit-font-smoothing: antialiased;
   background-color: #fff;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei","Source Han Sans CN",sans-serif;
 }
 
 #app {
@@ -61,6 +62,6 @@ body {
 }
 
 textarea {
-  padding: 2px 0 !important;
+  padding: 8px !important;
 }
 </style>

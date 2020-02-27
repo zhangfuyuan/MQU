@@ -51,7 +51,7 @@
         <div class="content">
           <!-- 读取图片/视频时 -->
           <template v-if="isReading">
-            <img src="../../assets/img/image_occupancy_map.png" alt="image_occupancy_map" width="100%" height="100%" />
+            <!-- <img src="../../assets/img/image_occupancy_map.png" alt="image_occupancy_map" width="100%" height="100%" /> -->
             
             <div class="reading-mask"></div>
             
@@ -78,19 +78,19 @@
             
             <!-- 视频内容 -->
             <template v-else-if="curMediaList[curMediaIndex].type==='video'">
-              <img src="../../assets/img/image_occupancy_map.png" alt="image_occupancy_map" width="100%" height="100%" />
+              <img src="../../assets/img/video_bitmap.png" alt="video_bitmap.png" width="100%" height="100%" />
             </template>
             
             <!-- 跑马灯内容 -->
             <template v-else-if="curMediaList[curMediaIndex].type === 'run'">
               <van-field
-                class="mqu-field"
+                :class="['mqu-field', { 'bgc-inverse': curMediaList[curMediaIndex].data.color==='#ffffff' }]"
                 v-model="curMediaList[curMediaIndex].data.content"
                 type="textarea"
                 :placeholder="$t('multimedia.clickInput')"
                 readonly
                 :style="{ 
-                  color: curMediaList[curMediaIndex].data.content ? convertRGBA(curMediaList[curMediaIndex].data.color, curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.opacity : '1') : '#333333',
+                  color: curMediaList[curMediaIndex].data.content ? convertRGBA(curMediaList[curMediaIndex].data.color, curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.opacity : '1') : (curMediaList[curMediaIndex].data.color==='#ffffff' ? '#ffffff' : '#333333'),
                   /*opacity: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.opacity : '1',*/
                   fontWeight: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.weight : 'normal',
                   textShadow: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.shadow : '0 0 0',
@@ -103,12 +103,13 @@
             <template v-else-if="curMediaList[curMediaIndex].type === 'txt'">
               <van-field
                 class="mqu-field"
+                :class="['mqu-field', { 'bgc-inverse': curMediaList[curMediaIndex].data.color==='#ffffff' }]"
                 v-model="curMediaList[curMediaIndex].data.content"
                 type="textarea"
                 :placeholder="$t('multimedia.clickInput')"
                 readonly
                 :style="{ 
-                  color: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.color : '#333333',
+                  color: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.color : (curMediaList[curMediaIndex].data.color==='#ffffff' ? '#ffffff' : '#333333'),
                   fontWeight: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.weight : 'normal',
                   textShadow: curMediaList[curMediaIndex].data.content ? curMediaList[curMediaIndex].data.shadow : '0 0 0',
                 }"
@@ -215,13 +216,13 @@
       >
         <van-field
           ref="editField"
-          class="mqu-field mqu-field-fill"
+          :class="['mqu-field', 'mqu-field-fill', { 'bgc-inverse': tempTextEditData.color==='#ffffff' }]"
           v-model="tempTextEditData.content"
           type="textarea"
           :maxlength="curMediaList[curMediaIndex].type==='run' ? runLengthLimit : txtLengthLimit"
           :placeholder="$t('multimedia.clickInput')"
           :style="{ 
-            color: tempTextEditData.content ? convertRGBA(tempTextEditData.color, curMediaList[curMediaIndex].type==='run'&&tempTextEditData.content ? tempTextEditData.opacity : '1') : '#333333',
+            color: tempTextEditData.content ? convertRGBA(tempTextEditData.color, curMediaList[curMediaIndex].type==='run'&&tempTextEditData.content ? tempTextEditData.opacity : '1') : (tempTextEditData.color==='#ffffff' ? '#ffffff' : '#333333'),
             /*opacity: curMediaList[curMediaIndex].type==='run'&&tempTextEditData.content ? tempTextEditData.opacity : '1',*/
             fontWeight: tempTextEditData.content ? tempTextEditData.weight : 'normal',
             textShadow: tempTextEditData.content ? tempTextEditData.shadow : '0 0 0',
@@ -259,27 +260,27 @@
               <div class="style-label">
                 <span 
                   class="style-color-txt" 
-                  :style="{ background: styleColorList[styleColorSlider] }"></span>
+                  :style="{ background: curMediaList[curMediaIndex].type==='run' ? styleRunColorList[styleColorSlider] : styleTxtColorList[styleColorSlider] }"></span>
               </div>
                 
               <van-slider 
-                class="style-color-cont"
+                :class="['style-color-cont', { 'style-color2-cont': curMediaList[curMediaIndex].type!=='run' }]"
                 v-model="styleColorSlider" 
                 :min="0" 
                 :max="24" 
                 :step="1"
                 :bar-height="(25/75) + 'rem'"
                 active-color="rgba(0, 0, 0, 0)"
-                @input="tempTextEditData.color = styleColorList[styleColorSlider];"
+                @input="tempTextEditData.color = (curMediaList[curMediaIndex].type==='run' ? styleRunColorList[styleColorSlider] : styleTxtColorList[styleColorSlider]);"
                 @drag-start="styleColorDragStart()"
                 @drag-end="styleColorDragEnd()"
               >
                 <div 
                   slot="button" 
                   class="style-color-button"
-                  :style="{ background: styleColorList[styleColorSlider] }"
+                  :style="{ background: curMediaList[curMediaIndex].type==='run' ? styleRunColorList[styleColorSlider] : styleTxtColorList[styleColorSlider] }"
                 >
-                  <span id="styleColorButton" class="title" :style="{ background: styleColorList[styleColorSlider] }"></span>
+                  <span id="styleColorButton" class="title" :style="{ background: curMediaList[curMediaIndex].type==='run' ? styleRunColorList[styleColorSlider] : styleTxtColorList[styleColorSlider] }"></span>
                 </div>
               </van-slider>
             </div>
@@ -456,7 +457,8 @@ export default {
       oIsLandscape: (window.orientation==90 || window.orientation==-90), // 初始化时设备是否为横屏
       isLandscape: (window.orientation==90 || window.orientation==-90), // 是否横屏
       isShowTabStyle: false, // 编辑文本界面是否激活 “样式” Tab（动态）
-      styleColorList: ['#ffffff','#9a9791','#6a6663','#34302f','#333333','#2d2824','#191814','#a86e35','#7e0e14','#c20e17','#e51b27','#e4451f','#ea7527','#f1c03c','#b4da4b','#7eb63e','#33862e','#88d9f3','#0994f5','#1064d4','#1b1c6f','#381a6c','#76128d','#e43b86','#f1cdd5'],
+      styleRunColorList: ['#ffffff','#9a9791','#6a6663','#34302f','#333333','#2d2824','#191814','#a86e35','#7e0e14','#c20e17','#e51b27','#e4451f','#ea7527','#f1c03c','#b4da4b','#7eb63e','#33862e','#88d9f3','#0994f5','#1064d4','#1b1c6f','#381a6c','#76128d','#e43b86','#f1cdd5'],
+      styleTxtColorList: ['#c1c1c1','#9a9791','#6a6663','#34302f','#333333','#2d2824','#191814','#a86e35','#7e0e14','#c20e17','#e51b27','#e4451f','#ea7527','#f1c03c','#b4da4b','#7eb63e','#33862e','#88d9f3','#0994f5','#1064d4','#1b1c6f','#381a6c','#76128d','#e43b86','#f1cdd5'],
       styleColorSlider: 4, // 颜色条索引（动态）
       styleOpacitySlider: 100, // 透明度（动态）
       styleWeightChecked: false, // 是否加粗（动态）
@@ -805,14 +807,14 @@ export default {
         type: 'run',
         data: {
           content: '',
-          color: '#333333',
+          color: '#ffffff',
           opacity: '1',
           weight: 'normal',
           shadow: '0 0 0',
         },
       });
       this.curMediaIndex = this.curMediaList.length - 1;
-      this.styleColorSlider = 4;
+      this.styleColorSlider = 0;
       this.styleOpacitySlider = 100;
       this.styleWeightChecked = false;
       this.styleShadowChecked = false;
@@ -827,7 +829,7 @@ export default {
       this.tempTextEditData.opacity = this.curMediaList[this.curMediaIndex].data.opacity;
       this.tempTextEditData.weight = this.curMediaList[this.curMediaIndex].data.weight;
       this.tempTextEditData.shadow = this.curMediaList[this.curMediaIndex].data.shadow;
-      this.styleColorSlider = this.styleColorList.indexOf(this.tempTextEditData.color);
+      this.styleColorSlider = this.styleRunColorList.indexOf(this.tempTextEditData.color);
       this.styleOpacitySlider = this.tempTextEditData.opacity * 100;
       this.styleWeightChecked = this.tempTextEditData.weight === 'bold';
       this.styleShadowChecked = this.tempTextEditData.shadow === '0 2px 3px';
@@ -877,7 +879,7 @@ export default {
       this.tempTextEditData.color = this.curMediaList[this.curMediaIndex].data.color;
       this.tempTextEditData.weight = this.curMediaList[this.curMediaIndex].data.weight;
       this.tempTextEditData.shadow = this.curMediaList[this.curMediaIndex].data.shadow;
-      this.styleColorSlider = this.styleColorList.indexOf(this.tempTextEditData.color);
+      this.styleColorSlider = this.styleTxtColorList.indexOf(this.tempTextEditData.color);
       this.styleWeightChecked = this.tempTextEditData.weight === 'bold';
       this.styleShadowChecked = this.tempTextEditData.shadow === '0 2px 3px';
       document.title = this.$t('multimedia.edit');
@@ -954,7 +956,7 @@ export default {
       window.$('#styleColorButton').css('opacity', '0');
     },
     
-    // 转换透明度为十六进制（暂不用）
+    // 转换透明度为十六进制
     convertOpacity(val) {
       let opacity = parseFloat(val) || 0;
       
@@ -973,7 +975,7 @@ export default {
         num_change = "0" + num_change;
       }
       
-      return num_change.toUpperCase();
+      return num_change.toLowerCase();
     },
     
     // 十六进制颜色值和透明度数值转rgba
@@ -1060,7 +1062,7 @@ export default {
                 "index": _runIndex + 1,
                 "kind": "3",
                 "transparency": parseInt(this.curMediaList[_runIndex].data.opacity*100),
-                "color": this.curMediaList[_runIndex].data.color,
+                "color": "#" + this.convertOpacity(this.curMediaList[_runIndex].data.opacity) + this.curMediaList[_runIndex].data.color.substr(1),
                 "bold": this.curMediaList[_runIndex].data.weight==='normal' ? "0" : "1",
                 "shadow": this.curMediaList[_runIndex].data.shadow==='0 0 0' ? "0" : "1",
                 "text": this.curMediaList[_runIndex].data.content,
@@ -1264,9 +1266,12 @@ export default {
         data.index = block.file.extraIndex; // 分片额外传播放序号参数
       });
       
-      /*this.uploader.on('uploadProgress', (file, percentage) => {
+      this.uploader.on('uploadProgress', (file, percentage) => {
         // window.console.log(`${file.name} uploadProgress percentage：`, percentage);
-      });*/
+        if (percentage !== 1) {
+          this.submitProgress = Math.floor((this.submittedNum+percentage)/this.curMediaList.length*100);
+        }
+      });
       
       this.uploader.on('uploadError', (file, reason) => {
         window.console.log(`${file.name} uploadError reason：`, reason);
@@ -1399,13 +1404,15 @@ export default {
       margin-bottom: 30px;
       height: 388px;
       position: relative;
-      border-radius: 10px;
+      /*border-radius: 10px;*/
       overflow: hidden;
     }
     
     .mqu-field {
-      border-bottom: @mqu-hairline;
-      padding: 0 0 20px;
+      /*border-bottom: @mqu-hairline;*/
+      border: 2px solid #7e7e7e;
+      border-radius: 10px;
+      padding: 0 0 19px;
     }
     
     /* 读取图片/视频时的遮罩 */
@@ -1421,6 +1428,7 @@ export default {
     }
     
     .reading-mask {
+      border-radius: 10px;
       background-color: #000;
       opacity: .5;
     }
@@ -1669,6 +1677,17 @@ export default {
       box-sizing: border-box;
     }
     
+    .style-color2-cont {
+      background: url(../../assets/img/color2_bar.png) center center no-repeat;
+      background-size: 100% 100%;
+      background: linear-gradient(to right,
+        #c1c1c1 4%, #9a9791 4% 8%, #6a6663 8% 12%, #34302f 12% 16%, #333333 16% 20%, 
+        #2d2824 20% 24%, #191814 24% 28%, #a86e35 28% 32%, #7e0e14 32% 36%, #c20e17 36% 40%, 
+        #e51b27 40% 44%, #e4451f 44% 48%, #ea7527 48% 52%, #f1c03c 52% 56%, #b4da4b 56% 60%,
+        #7eb63e 60% 64%, #33862e 64% 68%, #88d9f3 68% 72%, #0994f5 72% 76%, #1064d4 76% 80%,
+        #1b1c6f 80% 84%, #381a6c 84% 88%, #76128d 88% 92%, #e43b86 92% 96%, #f1cdd5 96%);
+    }
+    
     .style-color-button {
       position: relative;
       width: 30px;
@@ -1760,6 +1779,7 @@ export default {
     }
     
     .submit-cancel, .end-return {
+      margin-left: 25px;
       padding: 20px 30px;
       height: auto;
       font-size: 32px;

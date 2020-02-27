@@ -26,10 +26,13 @@ module.exports = {
     proxy: {
       '/api': {
         //target: 'http://119.23.61.139/prm-web',
-        target: 'http://192.168.1.28:8081/commServer',
+        //target: 'http://192.168.1.28:8081/commServer',
+        //target: 'http://119.23.61.139:11000/commServer',
+        target: 'http://192.168.1.238:11000/commServer',
+        //target: 'http://192.168.1.28:11000/commServer',
         ws: true,
         changeOrigin: true,
-        pathRewrite:{
+        pathRewrite: {
           '^/api': ''
         }
       }
