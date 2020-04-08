@@ -301,3 +301,111 @@
     transition: none !important;
   }
 }
+
+.vote-dialog {
+  .van-dialog__header {
+    padding-top: 0;
+    height: 75px;
+    line-height: 75px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 34px;
+    box-sizing: border-box;
+    font-weight: normal;
+  }
+
+  .van-cell__value,
+  .van-field__body,
+  .van-field__control {
+    color: inherit !important;
+    font-size: inherit !important;
+  }
+
+  .van-field__control {
+    border-radius: 0;
+    border-bottom: 2px solid #333;
+  }
+
+  .van-dialog__footer {
+    padding: 80px 0 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    [class*='van-hairline']::after {
+      border: none;
+    }
+
+    .van-dialog__cancel,
+    .van-dialog__confirm {
+      padding: 15px 34px 12px;
+      width: auto;
+      height: auto;
+      font-size: 28px;
+      line-height: 28px;
+      border-radius: 50px;
+      background: #fff;
+      background-color: #fff;
+      flex: none;
+
+      .van-button__text {
+        font-size: 28px;
+        line-height: 28px;
+      }
+    }
+
+    /* 左边按钮 */
+    .van-dialog__cancel {
+      border: 2px solid #008fff;
+      margin-right: 50px;
+
+      .van-button__text {
+        color: #008fff;
+      }
+
+      &:active {
+        border: 2px solid #0285eb;
+        background: #0285eb;
+        background-color: #0285eb;
+
+        .van-button__text {
+          color: #fff;
+        }
+      }
+    }
+
+    /* 右边按钮 */
+    .van-dialog__confirm {
+      border: 2px solid #008fff;
+      background: #008fff;
+      background-color: #008fff;
+
+      .van-button__text {
+        color: #fff;
+      }
+
+      &:active {
+        border: 2px solid #0285eb;
+        background: #0285eb;
+        background-color: #0285eb;
+      }
+    }
+
+    &::after {
+      border-color: #fff;
+    }
+  }
+
+  /* 禁用下的右边按钮 */
+  &.disabled {
+    .van-dialog__confirm,
+    .van-dialog__confirm:active {
+      border: 2px solid #7fc7ff;
+      background: #7fc7ff;
+      background-color: #7fc7ff;
+      pointer-events: none;
+    }
+  }
+}

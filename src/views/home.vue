@@ -1,70 +1,74 @@
 <template>
-	<div class="home">
-		<van-row class="home-row" type="flex" justify="center">
-			<van-col span="20">
-				<van-button class="home-btn" round type="primary" size="large" to="/multimedia">{{$t('multimedia.title')}}</van-button>
-			</van-col>
-		</van-row>
-		
-		<van-row type="flex" justify="center">
-			<van-col span="20">
-				<van-button class="home-btn" round type="info" size="large" to="/quickUpload">{{$t('quickUpload.title')}}</van-button>
-			</van-col>
-		</van-row>
-	</div>
+  <div class="home">
+    <van-row class="home-row" type="flex" justify="center">
+      <van-col span="20">
+        <van-button class="home-btn" round type="primary" size="large" to="/multimedia">{{ $t('multimedia.title') }}</van-button>
+      </van-col>
+    </van-row>
+
+    <van-row class="home-row" type="flex" justify="center">
+      <van-col span="20">
+        <van-button class="home-btn" round type="info" size="large" to="/quickUpload">{{ $t('quickUpload.title') }}</van-button>
+      </van-col>
+    </van-row>
+
+    <van-row class="home-row" type="flex" justify="center">
+      <van-col span="20">
+        <van-button class="home-btn" round type="warning" size="large" to="/votekit">{{ $t('votekit.title') }}</van-button>
+      </van-col>
+    </van-row>
+  </div>
 </template>
 
 <script>
 import { Row, Col, Button } from 'vant';
 
 export default {
-	name: 'home',
+  name: 'home',
 
-	mixins: [],
+  mixins: [],
 
-	components: {
-		[Row.name]: Row,
-		[Col.name]: Col,
-		[Button.name]: Button,
-	},
+  components: {
+    [Row.name]: Row,
+    [Col.name]: Col,
+    [Button.name]: Button
+  },
 
-	props: {},
+  props: {},
 
-	data() {
-		return {
-			
-		}
-	},
+  data() {
+    return {};
+  },
 
-	computed: {},
+  computed: {},
 
-	watch: {},
+  watch: {},
 
-	created() {},
+  created() {},
 
-	mounted() {},
+  mounted() {},
 
-	destroyed() {},
+  destroyed() {},
 
-	methods: {}
+  methods: {}
 };
 </script>
 
 <style lang="less">
 .home {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	
-	.home-row:not(:last-child) {
-		margin-bottom: 50px;
-	}
-	
-	.home-btn {
-		min-height: 75px;
-		font-size: 32px;
-	}
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .home-row:not(:last-of-type) {
+    margin-bottom: 50px;
+  }
+
+  .home-btn {
+    min-height: 75px;
+    font-size: 32px;
+  }
 }
 </style>

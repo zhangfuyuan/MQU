@@ -5,6 +5,8 @@ module.exports = {
     remove: '删除',
     done: '完成',
     send: '发送',
+    confirm: '确定',
+    failedToSend: '网络异常，发送失败',
   },
   multimedia: {
     title: '多媒体展示',
@@ -47,6 +49,15 @@ module.exports = {
     inputContent: '输入内容',
     addImgFormatTips: '请上传图片文件',
     uploading: '上传中...',
+  },
+  votekit: {
+    title: '投票工具',
+    vote: '投票',
+    realName: '需实名投票',
+    voting: '投票中...',
+    votedOptions: '已投选项',
+    voteExpired: '投票已失效',
+    noDoubleVote: '请勿重复投票',
   },
   error: {
     qrExpired: '二维码已过期',

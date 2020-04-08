@@ -2,7 +2,7 @@ const autoprefixer = require('autoprefixer');
 const pxtorem = require('postcss-pxtorem');
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/MQU/' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/MQU/dist' : '/',
   css: {
     loaderOptions: {
       postcss: {
@@ -21,15 +21,11 @@ module.exports = {
   },
   devServer: {
     port: '8126',
-    host: '192.168.1.83',
+    host: '192.168.14.153',
     open: true,
     proxy: {
       '/api': {
-        //target: 'http://119.23.61.139/prm-web',
-        //target: 'http://192.168.1.28:8081/commServer',
-        //target: 'http://119.23.61.139:11000/commServer',
-        target: 'http://192.168.1.238:11000/commServer',
-        //target: 'http://192.168.1.28:11000/commServer',
+        target: 'http://192.168.14.201:11000/commServer',
         ws: true,
         changeOrigin: true,
         pathRewrite: {

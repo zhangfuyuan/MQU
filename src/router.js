@@ -33,6 +33,14 @@ const routes = [
     }
   },
   {
+    path: '/votekit',
+    name: 'votekit',
+    component: () => import('./views/votekit'),
+    meta: {
+      title: 'votekit.title'
+    }
+  },
+  {
     path: '/error',
     name: 'error',
     component: () => import('./views/error'),

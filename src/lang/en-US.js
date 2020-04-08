@@ -5,6 +5,8 @@ module.exports = {
     remove: 'Delete',
     done: 'Done',
     send: 'Send',
+    confirm: 'Confirm',
+    failedToSend: 'network error, send failed',
   },
   multimedia: {
     title: 'Multimedia show',
@@ -47,6 +49,15 @@ module.exports = {
     inputContent: 'Input content',
     addImgFormatTips: 'Please upload the picture file',
     uploading: 'uploading...',
+  },
+  votekit: {
+    title: 'Votekit',
+    vote: 'Vote',
+    realName: 'Real name voting is required',
+    voting: 'Voting...',
+    votedOptions: 'Has cast options',
+    voteExpired: 'The vote has expired',
+    noDoubleVote: 'No double voting',
   },
   error: {
     qrExpired: 'Qr code expired',
