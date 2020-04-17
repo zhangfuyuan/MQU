@@ -43,7 +43,7 @@
       :confirm-button-text="$t('common.confirm')"
       @confirm="handleConfirm"
     >
-      <van-field ref="realNameEl" v-model="realNameInput" class="real-name" @click="$refs.realNameEl.focus();" />
+      <van-field ref="realNameEl" v-model="realNameInput" class="real-name" maxlength="8" @click="$refs.realNameEl.focus()" />
     </van-dialog>
 
     <!-- 投票中 -->
@@ -88,6 +88,7 @@
 import { Button, Toast, Dialog, Field, Overlay, Popup } from 'vant';
 import { myMixin } from '@/utils/mixins';
 import waves from '@/directive/waves/index.js'; // 水波纹指令
+import { ajaxTaskContent, ajaxVote } from '@/api/votekit/votekit';
 
 Toast.setDefaultOptions({
   className: 'mqu-toast'
@@ -117,12 +118,11 @@ export default {
       isIOS: /(\(i[^;]+;( U;)? CPU.+Mac OS X)|(iPhone)|(iPad)|(iPod)/i.test(navigator.userAgent), // 判断是否iOS系统
       isLandscape: window.orientation == 90 || window.orientation == -90, // 是否横屏
       isPageExpired: false, // 网页是否过期
-      taskId: '',
       subject: '',
       subjectId: '',
       options: [],
       multiple: '0',
-      realName: '',
+      realName: '0',
       showVotingDialog: false,
       realNameInput: '',
       showVotingOverlay: false,
@@ -161,12 +161,12 @@ export default {
     const query = this.$route.query;
 
     if (query) {
-      const { teid } = query;
+      const { id } = query;
 
-      if (teid) {
-        this.getVoteInfo(teid);
+      if (id) {
+        this.getVoteInfo(id);
       } else {
-        this.subject = 'URI missing "teid"';
+        this.subject = 'URI missing "id"';
         Toast(this.$t('common.failedToSend'));
       }
     }
@@ -176,6 +176,28 @@ export default {
 
   destroyed() {
     window.$(window).off('.orientationchange');
+  },
+
+  beforeRouteEnter(to, from, next) {
+    try {
+      const qrTimestamp = new Date(Number(to.query.timestamp)).getTime();
+      const nowTimestamp = Date.now();
+
+      if (nowTimestamp - qrTimestamp > 30 * 60000) {
+        // 二维码生成30分钟后过期
+        next({
+          path: '/error',
+          query: {
+            type: 'qrExpired'
+          }
+        });
+      } else {
+        next();
+      }
+    } catch (err) {
+      window.console.log(err);
+      next();
+    }
   },
 
   beforeRouteLeave(to, from, next) {
@@ -193,51 +215,28 @@ export default {
   },
 
   methods: {
-    getVoteInfo(teid) {
-      if (teid) {
-        const res = {
-          taskId: '任务ID',
-          subject: '投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题投票主题',
-          subjectId: Date.now() + '',
-          options: [
-            'A',
-            'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'M',
-            'N',
-            'O',
-            'P',
-            'Q',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'X',
-            'Y',
-            'Z'
-          ],
-          multiple: (parseInt(Math.random() * 10) % 2) + '',
-          realName: (parseInt(Math.random() * 10) % 2) + ''
-        };
-        const { taskId, subject, subjectId, options, multiple, realName } = res;
+    getVoteInfo(id) {
+      if (id) {
+        ajaxTaskContent({ id })
+          .then(res => {
+            const { errcode, data } = res;
 
-        this.taskId = taskId;
-        this.subject = subject;
-        this.subjectId = subjectId;
-        this.options = options;
-        this.multiple = multiple;
-        this.realName = realName;
+            if (errcode === 0 && data && data.content) {
+              const { subject, options, multiple, realName } = data.content;
+
+              this.subject = subject;
+              this.subjectId = id;
+              this.options = options.map(item => item.value);
+              this.multiple = multiple;
+              this.realName = realName;
+            } else {
+              Toast(this.$t('common.failedToSend'));
+            }
+          })
+          .catch(err => {
+            window.console.log(err);
+            Toast(this.$t('common.failedToSend'));
+          });
       } else {
         Toast(this.$t('common.failedToSend'));
       }
@@ -266,23 +265,45 @@ export default {
       else this.handleConfirm();
     },
     handleConfirm() {
-      window.console.log('Confirm');
       this.showVotingOverlay = true;
       this.submitVote();
     },
     submitVote() {
-      setTimeout(() => {
-        const res = {
-          msg: (parseInt(Math.random() * 10) % 2) + ''
-        };
-        const { msg } = res;
+      const submitContent = {};
 
-        this.showVotingOverlay = false;
-        this.voteResult = msg;
-        this.showVotingPopup = true;
+      submitContent.selectedOptions = this.selectedIndexList.map(index => index + 1 + '');
 
-        msg === '1' && window.localStorage && window.localStorage.setItem('subjectId', this.oldSubjectId ? `${this.oldSubjectId},${this.subjectId}` : this.subjectId);
-      }, 1000);
+      if (this.realName === '1') submitContent.realNameValue = this.realNameInput;
+
+      ajaxVote({
+        kind: '5',
+        taskId: this.subjectId,
+        content: JSON.stringify(submitContent)
+      })
+        .then(res => {
+          const { errcode } = res;
+
+          this.showVotingOverlay = false;
+
+          if (errcode === 0) {
+            // 投票成功
+            this.voteResult = '1';
+            this.showVotingPopup = true;
+            window.localStorage && window.localStorage.setItem('subjectId', this.oldSubjectId ? `${this.oldSubjectId},${this.subjectId}` : this.subjectId);
+          } else if (errcode === 10004) {
+            // 投票失效
+            this.voteResult = '0';
+            this.showVotingPopup = true;
+          } else {
+            // 其它异常
+            Toast(this.$t('common.failedToSend'));
+          }
+        })
+        .catch(err => {
+          window.console.log(err);
+          this.showVotingOverlay = false;
+          Toast(this.$t('common.failedToSend'));
+        });
     }
   }
 };
@@ -315,19 +336,17 @@ export default {
   .title {
     padding: 0 30px;
     width: 100%;
-    height: 90px;
+    min-height: 90px;
     box-sizing: border-box;
 
     .title-wrap {
+      .mixin-flex-center();
+      flex-wrap: wrap;
       width: 100%;
-      height: 100%;
-      line-height: 88px;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      min-height: 90px;
       color: @mqu-text-color333;
       font-size: 32px;
+      text-align: justify;
       border-bottom: @mqu-hairline;
       box-sizing: border-box;
     }

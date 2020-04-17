@@ -2,7 +2,7 @@ const autoprefixer = require('autoprefixer');
 const pxtorem = require('postcss-pxtorem');
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/MQU/dist' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/MQU/' : '/',
   css: {
     loaderOptions: {
       postcss: {
@@ -25,11 +25,19 @@ module.exports = {
     open: true,
     proxy: {
       '/api': {
-        target: 'http://192.168.14.201:11000/commServer',
+        target: 'http://mq.lango-tech.com:11000/commServer',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
+        }
+      },
+      '/vote-api': {
+        target: 'http://192.168.14.53:8081/voteServer',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/vote-api': ''
         }
       }
     }
